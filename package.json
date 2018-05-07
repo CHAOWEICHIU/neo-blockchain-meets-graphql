@@ -45,7 +45,7 @@
     "node": "8.9.3",
     "npm": "5.5.1"
   },
-  "repository": "",
+  "repository": "https://github.com/CHAOWEICHIU/neo-blockchain-meets-graphql",
   "author": "Wayne Chiu",
   "devDependencies": {
     "babel-cli": "6.26.0",
