@@ -13,16 +13,13 @@ const Container = styled.div`
 display:flex;
 width:100vw;
 height:100vh;
-background:black;
+background: ${props => props.theme.BG_BLACK};
 align-items:center;
 justify-content:center;
 `
 
 const StyledLink = styled.a`
-color:white;
-${props => {
-  console.log(props)
-}}
+color: ${props => props.theme.TX_WHITE};
 font-size: 50px;
 text-decoration: none;
 `
