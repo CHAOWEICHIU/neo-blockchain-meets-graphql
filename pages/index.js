@@ -1,7 +1,7 @@
 import React from 'react'
 import withRedux from 'next-redux-wrapper'
 import { compose, withState, withHandlers, renderComponent, branch } from 'recompose'
-import withApolloProvider from '../lib/withApolloProvider'
+import withNeededProviders from '../lib/withNeededProviders'
 import initStore from '../lib/store'
 import styled from 'styled-components'
 import { graphql } from 'react-apollo'
@@ -25,7 +25,7 @@ text-decoration: none;
 `
 
 export default compose(
-  withApolloProvider,
+  withNeededProviders,
   withRedux(initStore),
 )(props => (
   <Container>
