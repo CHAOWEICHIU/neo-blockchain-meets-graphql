@@ -1,0 +1,24 @@
+
+export default ({
+  /* Background Color */
+  BG_WHITE:'#FFFFFF',
+  BG_BLACK:'#000000',
+  BG_LIGHT_BLACK:'#0E1519',
+  BG_DEFAULT:'#122028',
+  BG_LIGHT_GRAY:'#1B2931',
+  BG_GRAY:'#26343C',
+  BG_DARK_BLUE:'#0C151A',
+
+  /* Text Color */ 
+  TX_WHITE:'#FFFFFF',
+  TX_BLACK:'#122028',
+  TX_GRAY:'#AAB9C2',
+  TX_DUSTY_GRAY:'#9B9B9B',
+  TX_DARK_GRAY:'#5E6C75',
+  TX_DARKER_GRAY:'#37454E',
+  TX_GREEN:'#13BF99',
+  TX_LIGHT_GREEN:'#a7ffeb',
+  TX_SHINE_GREEN:'#50e3c2',
+  TX_RED:'#FF435A',
+  TX_GOLD:'#B99E5D',
+})

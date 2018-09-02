@@ -20,6 +20,9 @@ justify-content:center;
 
 const StyledLink = styled.a`
 color:white;
+${props => {
+  console.log(props)
+}}
 font-size: 50px;
 text-decoration: none;
 `
