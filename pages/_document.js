@@ -4,17 +4,22 @@ import styledNormalize from 'styled-normalize'
 import { ServerStyleSheet } from 'styled-components'
 
 export default class MyDocument extends Document {
-  static getInitialProps({renderPage}) {
+  static getInitialProps({ renderPage, req: { locale, localeDataScript } }) {
     const sheet = new ServerStyleSheet()
     const page = renderPage(App => props => sheet.collectStyles(<App {...props} />))
     const styleTags = sheet.getStyleElement()
     return {
       ...page,
-      styleTags
+      styleTags,
+      locale,
+      localeDataScript,
     }
   }
 
   render() {
+    // Polyfill Intl API for older browsers
+    const polyfill = `https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.${this.props.locale}`
+
     return (
       <html>
       <Head>
@@ -32,8 +37,13 @@ export default class MyDocument extends Document {
         {this.props.styleTags}
       </Head>
       <body>
-      <Main/>
-      <NextScript/>
+        <Main/>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: this.props.localeDataScript,
+          }}
+        />
+        <NextScript/>
       </body>
       </html>
     )

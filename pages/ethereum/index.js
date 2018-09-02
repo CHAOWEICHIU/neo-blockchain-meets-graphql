@@ -3,11 +3,21 @@ import withRedux from 'next-redux-wrapper'
 import { compose, withState, withHandlers, renderComponent, branch } from 'recompose'
 import { TextField, FlatButton } from 'material-ui'
 import styled from 'styled-components'
+import { FormattedMessage, FormattedNumber, defineMessages } from 'react-intl'
 import { graphql } from 'react-apollo'
 import gql from 'graphql-tag'
 import Link from 'next/link'
-import withApolloProvider from '../../lib/withApolloProvider'
+import withNeededProviders from '../../lib/withNeededProviders'
+import withIntl from '../../lib/withIntl'
 import initStore from '../../lib/store'
+import Header from '../../components/Header.js';
+
+const { description } = defineMessages({
+  description: {
+    id: 'description',
+    defaultMessage: 'An example app integrating React Intl with Next.js'
+  }
+})
 
 const Container = styled.div`
 display:flex;
@@ -23,12 +33,15 @@ const StyledText = styled.div`
 `;
 
 export default compose(
-  withApolloProvider,
-  withRedux(initStore),
+  withNeededProviders,
+  // withRedux(initStore),
+  withIntl,
 )(props => (
   <Container>
+    {console.log(props)}
+    <Header />
     <StyledText>
-      ETH
+      <FormattedMessage id='greeting' defaultMessage='Hello, World!' />
     </StyledText>
   </Container>
 ))
