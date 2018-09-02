@@ -3,6 +3,7 @@ const next = require('next')
 const expressGraphQL = require('express-graphql')
 const schema = require('./lib/schema')
 const config = require('./config')
+const api = require('./api');
 const {
   BLOCKCHAIN_ENV,
 } = process.env
@@ -20,7 +21,7 @@ app
       graphiql: config[BLOCKCHAIN_ENV].NODE_ENV !== 'production',
       schema,
     }))
-
+    server.use('/api', api)
     server.get('*', (req, res) => {
       return handle(req, res)
     })
