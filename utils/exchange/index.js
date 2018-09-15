@@ -1,4 +1,3 @@
-/* eslint-disable */
 const fetch = require('node-fetch')
 const {
   cobinhoodApiKey = null,
@@ -25,19 +24,17 @@ const body = {
 
 fetch(`${configMapping.cobinhood.endpoint}/v1/trading/orders`, {
   method: 'POST',
-  body:    JSON.stringify(body),
+  body: JSON.stringify(body),
   headers: {
     'Content-Type': 'application/json',
-    'nonce': Date.now(),
-    'authorization': cobinhoodApiKey
+    nonce: Date.now(),
+    authorization: cobinhoodApiKey,
   },
 })
-.then(res => res.json())
-.then(json => console.log(json))
+  .then(res => res.json())
+  .then(json => console.log(json))
 
-
-
-
+/* eslint-disable */
 class UserExchange {
   constructor({ platform = '', apiKey = '' }) {
     if (!platform || !apiKey) {
