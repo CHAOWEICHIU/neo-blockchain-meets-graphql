@@ -1,10 +1,14 @@
 const WebSocket = require('ws')
 const moment = require('moment')
+const _ = require('lodash')
 // const Big = require('big.js')
 
 const WSS_ENDPOINT = 'wss://ws.cobinhood.com/v2/ws'
 const cobinhoodOrigin = 'https://cobinhood.com'
 
+/*
+* utils
+*/
 const typeMapping = word => ({
   s: 'snapshot',
   u: 'update',
@@ -30,6 +34,42 @@ const formatTicker = ticker => ({
   lastTradePrice: ticker[7],
 })
 
+const formatPricePoint = (point) => ({
+  price: point[0],
+  count: parseInt(point[1], 10),
+  size: point[2],
+})
+
+const formatPricePointUpdate = (point) => ({
+  price: point[0],
+  countDiff: parseInt(point[1], 10),
+  sizeDiff: point[2],
+})
+
+
+/*
+* constants
+*/
+const mapping = {
+  ticker: {
+    type: 'ticker',
+    format: formatTicker,
+  },
+  orderbook: {
+    type: 'order-book',
+    // format: formatOrdebook,
+  },
+}
+
+/*
+* Main
+*/
+
+const orderbook = {
+  bids: [],
+  asks: [],
+}
+
 const ws = new WebSocket(WSS_ENDPOINT, {
   headers: {
     Origin: cobinhoodOrigin,
@@ -38,13 +78,24 @@ const ws = new WebSocket(WSS_ENDPOINT, {
   },
 })
 
-
 setTimeout(() => {
+  /* Ticker */
+  /*
   const data = JSON.stringify({
     type: 'ticker',
     action: 'subscribe',
     trading_pair_id: 'BTC-USDT',
   })
+  */
+
+  const data = JSON.stringify({
+    type: mapping.orderbook.type,
+    action: 'subscribe',
+    trading_pair_id: 'ETH-BTC',
+    precision: '1E-6',
+  })
+
+
   ws.send(data)
 
   setInterval(() => {
@@ -56,11 +107,30 @@ setTimeout(() => {
 
 const onWSMessage = (message) => {
   const msg = formatMsg(JSON.parse(message))
-  const data = formatTicker(msg.data)
+  // const data = msg.type === 'update'
+  //   ? ({
+  //     bids: _.isEmpty(msg.data.bids) ? [] : msg.data.bids.map(formatPricePointUpdate),
+  //     asks: _.isEmpty(msg.data.asks) ? [] : msg.data.asks.map(formatPricePointUpdate),
+  //   })
+  //   : ({
+  //     bids: _.isEmpty(msg.data.bids) ? [] : msg.data.bids.map(formatPricePoint),
+  //     asks: _.isEmpty(msg.data.asks) ? [] : msg.data.asks.map(formatPricePoint),
+  //   })
+  if (msg.type === 'update') {
+    
+    
+  } else {
+    orderbook.bids.push(_.isEmpty(msg.data.bids) ? [] : msg.data.bids.map(formatPricePoint))
+    orderbook.asks.push(_.isEmpty(msg.data.asks) ? [] : msg.data.asks.map(formatPricePoint))
 
-  console.log('message:\n', message, '\n\n')
-  console.log('message:\n', msg, '\n\n')
-  console.log('data', data, '\n\n')
+    console.log(orderbook)
+    // orderbook.bids.push(_.isEmpty(msg.data.bids) ? [] : msg.data.bids.map(formatPricePointUpdate))
+    // orderbook.asks.push(_.isEmpty(msg.data.asks) ? [] : msg.data.asks.map(formatPricePointUpdate))
+  }
+
+  // console.log('message:\n', message, '\n\n')
+  // console.log('message:\n', msg, '\n\n')
+  console.log('data', orderbook, '\n\n')
   // formatTicker
 }
 const onWSOpen = (message) => {
