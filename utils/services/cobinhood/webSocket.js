@@ -28,7 +28,6 @@ const subscribeOrderBook = ({ pair }) => {
     action: 'subscribe',
     type: 'order-book',
     trading_pair_id: pair,
-    precision: '1E-6',
   }
   ws.send(JSON.stringify(data))
 }

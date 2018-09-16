@@ -22,11 +22,13 @@ const quoteProviderReducer = (state = initialState, action) => {
 
       let bids = state.getIn(['orderBooks', pair, 'bids'], List())
       let asks = state.getIn(['orderBooks', pair, 'asks'], List())
+      const inputBids = data.bids
+      const inputAsks = data.asks
       let shouldSort = false
 
-      if (data.bids.length !== 0) {
+      if (inputBids.length !== 0) {
         shouldSort = false
-        data.bids
+        inputBids
           .map(([price,, amount]) => ({
             price: Number(price),
             amount: Number(amount),
@@ -38,6 +40,7 @@ const quoteProviderReducer = (state = initialState, action) => {
             } else {
               const index = bids.findIndex(item => item.get('price') === price)
               if (index === -1) {
+                shouldSort = true
                 bids = bids
                   .push(fromJS({
                     price,
@@ -59,12 +62,11 @@ const quoteProviderReducer = (state = initialState, action) => {
       }
 
 
-      if (asks.length) {
+      if (inputAsks.length !== 0) {
         shouldSort = false
-        asks
+        inputAsks
           .map(([price,, amount]) => ({
             price: Number(price),
-            // count: Number(count),
             amount: Number(amount),
           }))
           .forEach(({ price, amount }) => {
@@ -97,8 +99,8 @@ const quoteProviderReducer = (state = initialState, action) => {
       }
 
       return state
-        .setIn(['orderBooks', pair, 'bids'], bids.take(3))
-        .setIn(['orderBooks', pair, 'asks'], asks.take(3))
+        .setIn(['orderBooks', pair, 'bids'], bids)
+        .setIn(['orderBooks', pair, 'asks'], asks)
     }
 
     case RECEIVED_ORDER: {
@@ -111,45 +113,22 @@ const quoteProviderReducer = (state = initialState, action) => {
       const inputAsks = data.asks
       const inputBids = data.bids
 
-      let totalBids = 0
-
       const bids = fromJS(
         inputBids
           .slice(0, 1000)
-          .map(([price, count, amount]) => ({
+          .map(([price,, amount]) => ({
             price: Number(price),
-            count: Number(count),
             amount: Number(amount),
-          }))
-          .map(({ price, count, amount }) => {
-            totalBids += Number(amount)
-            return {
-              price,
-              count,
-              amount,
-              total: totalBids,
-            }
-          }),
+          })),
       )
 
-      let totalAsks = 0
       const asks = fromJS(
         inputAsks
           .slice(0, 1000)
-          .map(([price, count, amount]) => ({
+          .map(([price,, amount]) => ({
             price: Number(price),
-            count: Number(count),
             amount: Number(amount),
-          }))
-          .map(({ price, count, amount }) => {
-            totalAsks += Number(amount)
-            return {
-              price,
-              count,
-              amount,
-              total: totalAsks,
-            }
-          }),
+          })),
       )
 
       const highestBid = bids.getIn([0, 'price'], 0)
@@ -158,8 +137,8 @@ const quoteProviderReducer = (state = initialState, action) => {
 
       return state
         .setIn(['orderBooks', pair, 'precision'], precision)
-        .setIn(['orderBooks', pair, 'bids'], bids.take(3))
-        .setIn(['orderBooks', pair, 'asks'], asks.take(3))
+        .setIn(['orderBooks', pair, 'bids'], bids.sortBy(item => -1 * item.get('price')))
+        .setIn(['orderBooks', pair, 'asks'], asks.sortBy(item => item.get('price')))
         .setIn(['orderBooks', pair, 'spread'], spread)
     }
     default:

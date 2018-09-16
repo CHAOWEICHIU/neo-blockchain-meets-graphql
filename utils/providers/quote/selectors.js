@@ -18,13 +18,9 @@ const makeSelectPairAskAndBid = ({ pair, count = 1 }) => createSelector(
   (pairInformation) => {
     const asks = pairInformation.get('asks', List())
     const bids = pairInformation.get('bids', List())
-    // console.log('qqqqq',pairInformation.get('asks', List()))
-    console.log(pair, '\n', 'asks\n', asks.toJS(), '\nbids\n', bids.toJS(), '\n\n\n')
-    
-    
     return ({
-      ask: 1,
-      // bid: bids.take(count),
+      asks: asks.take(count),
+      bids: bids.take(count),
     })
   },
 )

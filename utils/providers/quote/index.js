@@ -18,13 +18,12 @@ Promise
   .then(data => store.dispatch(receivedRates(data)))
   .then(() => {
     subscribeOrderBook({ pair: 'ETH-USDT' })
-    subscribeOrderBook({ pair: 'BTC-USDT' })
     subscribeOrderBook({ pair: 'ETH-BTC' })
+    subscribeOrderBook({ pair: 'BTC-USDT' })
 
     ws.on('message', (response) => {
       const message = formatMsg(JSON.parse(response))
       const { data } = message
-
       const [type, pair, additional] = message.channel.split('.')
       if (type === 'order-book') {
         if (message.type === 'snapshot') return store.dispatch(receivedOrder({ pair, data, precision: additional }))
