@@ -1,5 +1,6 @@
 /* eslint-disable */
 const moment = require('moment')
+const { min } = require('lodash')
 const { createStore, combineReducers } = require('redux')
 const quoteProviderReducer = require('./quote/reducer')
 const { mul, div } = require('../calculation')
@@ -30,6 +31,27 @@ store.subscribe(() => {
     btc.getIn([0, 'price']),
     usdt.getIn([0, 'price']),
   )
+  let maxEthTradableAmount = min([
+      mul([
+        min([
+          div(eth.getIn([0,'amount']),eth.getIn([0, 'price'])),
+          btc.getIn([0, 'amount'])
+        ]),
+        btc.getIn([0, 'price']),
+      ]),
+      usdt.getIn([0, 'amount'])
+    ])
+  
+  console.log(arbitrageA);
+  console.log(maxEthTradableAmount);
+  console.log('\n');
+  
+  
+  
+  
+  
+  
+  
 
   // console.log(moment().format('YYYY-MM-DD hh:mm:ss'),JSON.stringify(r, null, 2), '\n\n');
 })
