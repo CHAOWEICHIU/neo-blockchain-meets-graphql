@@ -1,15 +1,14 @@
-/* eslint-disable */
 const moment = require('moment')
 const { min } = require('lodash')
 const { createStore, combineReducers } = require('redux')
 const quoteProviderReducer = require('./quote/reducer')
 const { mul, div } = require('../calculation')
-const { selectQuoteProviderDomain, makeSelectPairAskAndBid, makeSelectOrderBook } = require('./quote/selectors')
+const { makeSelectPairAskAndBid } = require('./quote/selectors')
 
 const store = createStore(
   combineReducers({
     quote: quoteProviderReducer,
-  })
+  }),
 )
 
 module.exports = {
@@ -21,38 +20,65 @@ require('./quote')
 
 
 store.subscribe(() => {
-  const { asks: eth } = makeSelectPairAskAndBid({ pair: 'ETH-USDT', count: 1 })(store.getState())
-  const { bids: btc } = makeSelectPairAskAndBid({ pair: 'ETH-BTC', count: 1 })(store.getState())
-  const { bids: usdt } = makeSelectPairAskAndBid({ pair: 'BTC-USDT', count: 1 })(store.getState())
+  const { asks: askEth, bids: buyEth } = makeSelectPairAskAndBid({ pair: 'ETH-USDT', count: 1 })(store.getState())
+  const { bids: buyBtc, asks: askBtc } = makeSelectPairAskAndBid({ pair: 'ETH-BTC', count: 1 })(store.getState())
+  const { bids: buyUsdt, asks: askUsdt } = makeSelectPairAskAndBid({ pair: 'BTC-USDT', count: 1 })(store.getState())
 
   /* arbitrage = USDT -> ETH -> BTC -> USDT */
-  let arbitrageA = mul(
-    div(1000, eth.getIn([0, 'price'])),
-    btc.getIn([0, 'price']),
-    usdt.getIn([0, 'price']),
+
+  const arbitrageBuy = div(
+    mul(1000, buyEth.getIn([0, 'price'])),
+    askBtc.getIn([0, 'price']),
+    askUsdt.getIn([0, 'price']),
   )
-  let maxEthTradableAmount = min([
-      mul([
-        min([
-          div(eth.getIn([0,'amount']),eth.getIn([0, 'price'])),
-          btc.getIn([0, 'amount'])
-        ]),
-        btc.getIn([0, 'price']),
+
+  const maxForBuy = min([
+    div(
+      min([
+        mul(
+          buyEth.getIn([0, 'amount']),
+          buyEth.getIn([0, 'price']),
+        ),
+        askBtc.getIn([0, 'amount']),
       ]),
-      usdt.getIn([0, 'amount'])
-    ])
-  
-  console.log(arbitrageA);
-  console.log(maxEthTradableAmount);
-  console.log('\n');
-  
-  
-  
-  
-  
-  
-  
+      askBtc.getIn([0, 'price']),
+    ),
+    askUsdt.getIn([0, 'amount']),
+  ])
 
-  // console.log(moment().format('YYYY-MM-DD hh:mm:ss'),JSON.stringify(r, null, 2), '\n\n');
+  const arbitrageSell = mul(
+    div(1000, askEth.getIn([0, 'price'])),
+    buyBtc.getIn([0, 'price']),
+    buyUsdt.getIn([0, 'price']),
+  )
+
+  const maxForSell = min([
+    mul([
+      min([
+        div(askEth.getIn([0, 'amount']), askEth.getIn([0, 'price'])),
+        buyBtc.getIn([0, 'amount']),
+      ]),
+      buyBtc.getIn([0, 'price']),
+    ]),
+    buyUsdt.getIn([0, 'amount']),
+  ])
+
+  console.log(`
+  ${moment().format('YYYY-MM-DD hh:mm:ss')}
+
+  Arbitrage Buy
+  ${arbitrageBuy}
+  Max Amount
+  ${maxForBuy}
+
+  Arbitrage Sell
+  ${arbitrageSell}
+  Max Amount
+  ${maxForSell}
+
+
+
+
+
+  `)
 })
-
