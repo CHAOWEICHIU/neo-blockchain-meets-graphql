@@ -11,5 +11,6 @@ describe('User Exchange', () => {
     expect(user.placeOrder).toBeDefined()
     expect(user.getOrders).toBeDefined()
     expect(user.cancelAllOrders).toBeDefined()
+    expect(user.cancelOrder).toBeDefined()
   })
 })

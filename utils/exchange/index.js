@@ -1,38 +1,13 @@
-const fetch = require('node-fetch')
 const {
-  cobinhoodApiKey = null,
-} = require('../../env')
+  placeOrder,
+  cancelOrder,
+  getOpenOrders,
+} = require('../services/cobinhood/index')
 
 const wordMapping = word => ({
   buy: 'bid',
   ask: 'sell',
 })[word] || word
-
-const configMapping = {
-  cobinhood: {
-    endpoint: 'https://api-staging.cobber.rocks',
-  },
-}
-
-const body = {
-  trading_pair_id: 'COB-ETH',
-  price: '0.3',
-  type: 'limit',
-  side: wordMapping('buy'),
-  size: '1000',
-}
-
-fetch(`${configMapping.cobinhood.endpoint}/v1/trading/orders`, {
-  method: 'POST',
-  body: JSON.stringify(body),
-  headers: {
-    'Content-Type': 'application/json',
-    nonce: Date.now(),
-    authorization: cobinhoodApiKey,
-  },
-})
-  .then(res => res.json())
-  .then(json => console.log(json))
 
 /* eslint-disable */
 class UserExchange {
@@ -44,9 +19,13 @@ class UserExchange {
     this.apiKey = apiKey
   }
 
-  placeOrder() {
-    return new Promise((resolve, reject) => {
-      resolve('placeOrder')
+  placeOrder({ tradingPairId, price, type, side, size }) {
+    return placeOrder({
+      tradingPairId,
+      type,
+      price,
+      side: wordMapping(side),
+      size,
     })
   }
 
@@ -56,10 +35,19 @@ class UserExchange {
     })
   }
 
-  cancelAllOrders() {
-    return new Promise((resolve, reject) => {
-      resolve('cancelAllOrders')
+  cancelOrder({ orderId }) {
+    return cancelOrder({
+      orderId,
     })
+  }
+
+  cancelAllOrders({ tradingPairId }) {
+    if(tradingPairId) {
+      return getOpenOrders({ tradingPairId })
+        .then(({ orders }) => orders.map(order => order.id))
+        .then(orderIds => batchCancelOrders({ tradingPairId, orderIds }))  
+    }
+    return Promise.reject({ reason: 'tradingPairId needed' })
   }
 }
 

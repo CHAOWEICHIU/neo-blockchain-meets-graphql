@@ -30,6 +30,7 @@
     "node-fetch": "2.2.0",
     "node-telegram-bot-api": "0.30.0",
     "prop-types": "15.6.2",
+    "query-string": "6.1.0",
     "react": "16.4.2",
     "react-apollo": "2.1.11",
     "react-dom": "16.4.2",

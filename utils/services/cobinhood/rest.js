@@ -11,6 +11,30 @@ const apiGet = ({ url }) => fetch(`${configMapping.cobinhood.endpoint}${url}`, {
   },
 }).then(res => res.json())
 
+const apiPost = ({ url, body }) => fetch(`${configMapping.cobinhood.endpoint}${url}`, {
+  method: 'POST',
+  body: JSON.stringify(body),
+  headers: {
+    'Content-Type': 'application/json',
+    nonce: Date.now(),
+    authorization: cobinhoodApiKey,
+  },
+})
+  .then(res => res.json())
+
+const apiDelete = ({ url, body = '' }) => fetch(`${configMapping.cobinhood.endpoint}${url}`, {
+  method: 'DELETE',
+  body: JSON.stringify(body),
+  headers: {
+    'Content-Type': 'application/json',
+    nonce: Date.now(),
+    authorization: cobinhoodApiKey,
+  },
+})
+  .then(res => res.json())
+
 module.exports = {
   apiGet,
+  apiPost,
+  apiDelete,
 }
