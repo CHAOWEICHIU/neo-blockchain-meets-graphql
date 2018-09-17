@@ -1,4 +1,5 @@
 const moment = require('moment')
+const fs = require('fs')
 const { min } = require('lodash')
 const { createStore, combineReducers } = require('redux')
 const quoteProviderReducer = require('./quote/reducer')
@@ -18,21 +19,22 @@ module.exports = {
 /* Logic to fetch data */
 require('./quote')
 
+const base = 1000
 
-store.subscribe(() => {
-  const { asks: askEth, bids: buyEth } = makeSelectPairAskAndBid({ pair: 'ETH-USDT', count: 1 })(store.getState())
-  const { bids: buyBtc, asks: askBtc } = makeSelectPairAskAndBid({ pair: 'ETH-BTC', count: 1 })(store.getState())
-  const { bids: buyUsdt, asks: askUsdt } = makeSelectPairAskAndBid({ pair: 'BTC-USDT', count: 1 })(store.getState())
-
-  /* arbitrage = USDT -> ETH -> BTC -> USDT */
-
-  const arbitrageBuy = div(
-    mul(1000, buyEth.getIn([0, 'price'])),
+const arbitrage = ({
+  askEth,
+  buyEth,
+  askBtc,
+  buyBtc,
+  askUsdt,
+  buyUsdt,
+}) => ({
+  arbitrageBuy: div(
+    mul(base, buyEth.getIn([0, 'price'])),
     askBtc.getIn([0, 'price']),
     askUsdt.getIn([0, 'price']),
-  )
-
-  const maxForBuy = min([
+  ),
+  maxForBuy: min([
     div(
       min([
         mul(
@@ -44,15 +46,13 @@ store.subscribe(() => {
       askBtc.getIn([0, 'price']),
     ),
     askUsdt.getIn([0, 'amount']),
-  ])
-
-  const arbitrageSell = mul(
-    div(1000, askEth.getIn([0, 'price'])),
+  ]),
+  arbitrageSell: mul(
+    div(base, askEth.getIn([0, 'price'])),
     buyBtc.getIn([0, 'price']),
     buyUsdt.getIn([0, 'price']),
-  )
-
-  const maxForSell = min([
+  ),
+  maxForSell: min([
     mul([
       min([
         div(askEth.getIn([0, 'amount']), askEth.getIn([0, 'price'])),
@@ -61,10 +61,19 @@ store.subscribe(() => {
       buyBtc.getIn([0, 'price']),
     ]),
     buyUsdt.getIn([0, 'amount']),
-  ])
+  ]),
+})
 
-  console.log(`
+const logging = ({
+  arbitrageBuy,
+  maxForBuy,
+  arbitrageSell,
+  maxForSell,
+  flow,
+}) => {
+  const log = `
   ${moment().format('YYYY-MM-DD hh:mm:ss')}
+  ${flow}
 
   Arbitrage Buy
   ${arbitrageBuy}
@@ -75,10 +84,40 @@ store.subscribe(() => {
   ${arbitrageSell}
   Max Amount
   ${maxForSell}
+  `
 
+  if (arbitrageBuy > base || arbitrageSell > base) {
+    const data = JSON.parse(fs.readFileSync('./record.json', 'utf8'))
+    console.log(log)
+    data.push({
+      flow,
+      time: moment().format('YYYY-MM-DD hh:mm:ss'),
+      arbitrageBuy,
+      maxForBuy,
+      arbitrageSell,
+      maxForSell,
+    })
+    fs.writeFile('./record.json', JSON.stringify(data, null, 2), 'utf8', (err) => {
+      console.log(err)
+    })
+  }
+}
 
+store.subscribe(() => {
+  const { asks: askEth, bids: buyEth } = makeSelectPairAskAndBid({ pair: 'ETH-USDT', count: 1 })(store.getState())
+  const { bids: buyBtc, asks: askBtc } = makeSelectPairAskAndBid({ pair: 'ETH-BTC', count: 1 })(store.getState())
+  const { bids: buyUsdt, asks: askUsdt } = makeSelectPairAskAndBid({ pair: 'BTC-USDT', count: 1 })(store.getState())
 
-
-
-  `)
+  /* arbitrage = USDT -> ETH -> BTC -> USDT */
+  logging(
+    arbitrage({
+      flow: 'USDT.ETH.BTC.USDT',
+      askEth,
+      buyEth,
+      buyBtc,
+      askBtc,
+      buyUsdt,
+      askUsdt,
+    }),
+  )
 })
