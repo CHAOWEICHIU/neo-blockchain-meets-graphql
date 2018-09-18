@@ -6,7 +6,7 @@ const getRates = ({ currencyId }) => apiGet({
   url: `/v1/market/exchange_rates/${toUpper(currencyId)}`,
 })
 
-const getOpenOrders = ({ tradingPairId, limit, page }) => apiGet({
+const getOpenOrders = ({ tradingPairId, limit = 100, page }) => apiGet({
   url: `/v1/trading/orders?${queryString.stringify(Object.assign(
     {},
     tradingPairId ? { trading_pair_id: tradingPairId } : {},
