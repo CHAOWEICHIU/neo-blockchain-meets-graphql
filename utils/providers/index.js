@@ -3,12 +3,14 @@ const fs = require('fs')
 const { min } = require('lodash')
 const { createStore, combineReducers } = require('redux')
 const quoteProviderReducer = require('./quote/reducer')
+const orderProviderReducer = require('./order/reducer')
 const { mul, div } = require('../calculation')
 const { makeSelectPairAskAndBid } = require('./quote/selectors')
 
 const store = createStore(
   combineReducers({
     quote: quoteProviderReducer,
+    order: orderProviderReducer,
   }),
 )
 
