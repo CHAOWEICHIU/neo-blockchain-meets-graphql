@@ -1,37 +1,42 @@
 const Big = require('big.js')
 
-const wrapper = fn => ((...args) => {
+const RM = {
+  ROUND_DOWN: 0,
+  ROUND_HALF_UP: 1,
+  ROUND_HALF_EVEN: 2,
+  ROUND_UP: 3,
+}
+
+const catchWrapper = fn => ((...args) => {
   try {
-    const bigs = args.map(it => Big(it))
-    return fn(bigs).toFixed()
+    return fn(...args).toFixed()
   } catch (e) {
     return undefined
   }
 })
 
-const add = wrapper(bigs => (
-  bigs.reduce((sum, val) => (
-    sum ? sum.plus(val) : val
-  ), undefined)))
+const OperationGenerator = op => (
+  (...args) => (
+    args.reduce(
+      (sum, val) => (sum ? sum[op](val) : Big(val)),
+      undefined,
+    )
+  )
+)
 
-const sub = wrapper(bigs => (
-  bigs.reduce((sum, val) => (
-    sum ? sum.minus(val) : val
-  ), undefined)))
+const add = catchWrapper(OperationGenerator('plus'))
+const sub = catchWrapper(OperationGenerator('minus'))
+const mul = catchWrapper(OperationGenerator('times'))
+const div = catchWrapper(OperationGenerator('div'))
 
-const mul = wrapper(bigs => (
-  bigs.reduce((sum, val) => (
-    sum ? sum.times(val) : val
-  ), undefined)))
-
-const div = wrapper(bigs => (
-  bigs.reduce((sum, val) => (
-    sum ? sum.div(val) : val
-  ), undefined)))
+const round = catchWrapper((num, precision = 10, type = RM.ROUND_DOWN) => (
+  Big(num).round(precision, type)
+))
 
 module.exports = {
   add,
   sub,
   mul,
   div,
+  round,
 }
