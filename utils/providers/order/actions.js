@@ -5,6 +5,12 @@ const receivedOrders = payload => ({
   payload,
 })
 
+const receivedOrder = payload => ({
+  type: RECEIVED_ORDER,
+  payload,
+})
+
 module.exports = {
   receivedOrders,
+  receivedOrder,
 }

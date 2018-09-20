@@ -1,5 +1,6 @@
 const WebSocket = require('ws')
 const { configMapping } = require('../constants')
+const { cobinhoodApiKey } = require('../../../env')
 
 const typeMapping = word => ({
   s: 'snapshot',
@@ -18,7 +19,7 @@ const formatMsg = msg => ({
 const ws = new WebSocket(configMapping.cobinhood.wsEndpoint, {
   headers: {
     Origin: configMapping.cobinhood.origin,
-    // Authorization: this.key || '',
+    Authorization: cobinhoodApiKey || '',
     Nonce: new Date().valueOf(),
   },
 })
@@ -32,6 +33,44 @@ const subscribeOrderBook = ({ pair }) => {
   ws.send(JSON.stringify(data))
 }
 
+const placeOrder = ({
+  tradingPairId,
+  type = '0',
+  /*
+  * 0: limit
+  * 1: market
+  * 2: stop
+  * 3: limit_stop
+  * 4: trailing_fiat_stop (not valid yet)
+  * 5: fill_or_kill (not valid yet)
+  * 6: trailing_percent_stop (not valid yet)
+  */
+
+  price,
+  side,
+  size,
+}) => {
+  const data = {
+    action: 'place_order',
+    trading_pair_id: tradingPairId,
+    type,
+    price,
+    size,
+    side,
+    source: 'exchange',
+    id: Date.now(),
+  }
+  ws.send(JSON.stringify(data))
+}
+
+const subscribeOrder = () => {
+  const data = {
+    action: 'subscribe',
+    type: 'order',
+  }
+  ws.send(JSON.stringify(data))
+}
+
 ws.on('open', () => {
   setInterval(() => {
     ws.send(JSON.stringify({
@@ -39,11 +78,24 @@ ws.on('open', () => {
     }))
   }, 60 * 1000)
 })
+ws.on('message', (msg) => {
+  const { type, channel } = formatMsg(JSON.parse(msg))
+  if (type === 'subscribed') {
+    const log = `
+  System Notification:
+  channel: ${channel} subscribed
+
+    `
+    console.log(log)
+  }
+})
 ws.on('error', err => console.error(err))
 ws.on('close', () => console.log('close'))
 
 module.exports = {
   ws,
   subscribeOrderBook,
+  subscribeOrder,
+  placeOrder,
   formatMsg,
 }

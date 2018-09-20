@@ -5,7 +5,11 @@ const {
   bufferOrder,
 } = require('./actions')
 const { store } = require('../index')
-const { ws, subscribeOrderBook, formatMsg } = require('../../services/cobinhood/webSocket')
+const {
+  ws,
+  subscribeOrderBook,
+  formatMsg,
+} = require('../../services/cobinhood/webSocket')
 
 const neededCurrenciesRate = [
   'ETH',

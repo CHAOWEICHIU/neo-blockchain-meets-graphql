@@ -20,6 +20,7 @@ module.exports = {
 
 /* Logic to fetch data */
 require('./quote')
+require('./order')
 
 const base = 1000
 
