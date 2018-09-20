@@ -1,4 +1,7 @@
-const { RECEIVED_ORDERS } = require('./constants')
+const {
+  RECEIVED_ORDERS,
+  RECEIVED_ORDER,
+} = require('./constants')
 
 const receivedOrders = payload => ({
   type: RECEIVED_ORDERS,
