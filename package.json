@@ -23,6 +23,7 @@
     "immutable": "3.8.2",
     "isomorphic-fetch": "2.2.1",
     "lodash": "4.17.10",
+    "loglevel-colored-level-prefix": "1.0.0",
     "material-ui": "0.20.2",
     "moment": "2.22.2",
     "next": "6.1.1",
