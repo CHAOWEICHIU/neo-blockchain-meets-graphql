@@ -1,4 +1,3 @@
-/* eslint-disable */
 const Big = require('big.js')
 const {
   add,

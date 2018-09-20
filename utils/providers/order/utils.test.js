@@ -1,4 +1,3 @@
-/* eslint-disable */
 const { processLimitOrderFromWebSocket } = require('./utils')
 
 describe('processLimitOrderFromWebSocket', () => {

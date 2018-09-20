@@ -1,4 +1,3 @@
-/* eslint-disable */
 const UserExchange = require('./')
 
 const user = new UserExchange({
