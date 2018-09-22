@@ -4,3 +4,6 @@
 - Need .env file
 - yarn install
 - yarn run dev
+
+## TODO
+- add order book from Bianace
