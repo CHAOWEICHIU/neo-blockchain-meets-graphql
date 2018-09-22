@@ -1,5 +1,10 @@
 const WebSocket = require('ws')
 const { configMapping } = require('../constants')
+const {
+  wsWarning,
+  wsError,
+  wsInfo,
+} = require('../../logger')
 const { cobinhoodApiKey } = require('../../../env')
 
 const typeMapping = word => ({
@@ -81,16 +86,11 @@ ws.on('open', () => {
 ws.on('message', (msg) => {
   const { type, channel } = formatMsg(JSON.parse(msg))
   if (type === 'subscribed') {
-    const log = `
-  System Notification:
-  channel: ${channel} subscribed
-
-    `
-    console.log(log)
+    wsInfo({ message: `${channel} subscribed` })
   }
 })
-ws.on('error', err => console.error(err))
-ws.on('close', () => console.log('close'))
+ws.on('error', err => wsError({ message: err }))
+ws.on('close', () => wsWarning({ message: 'CLOSE' }))
 
 module.exports = {
   ws,

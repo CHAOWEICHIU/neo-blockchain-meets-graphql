@@ -21,4 +21,7 @@ const getLogger = require('loglevel-colored-level-prefix')
 
 module.exports = {
   systemLogger: ({ message }) => getLogger({ prefix: '[SYSTEM]', level: 'trace' }).info(`\n${message}\n`),
+  wsWarning: ({ message }) => getLogger({ prefix: '[WEBSOCKET]', level: 'error' }).error(`\n${message}\n`),
+  wsError: ({ message }) => getLogger({ prefix: '[WEBSOCKET]', level: 'warn' }).warn(`\n${message}\n`),
+  wsInfo: ({ message }) => getLogger({ prefix: '[WEBSOCKET]', level: 'info' }).info(`\n${message}\n`),
 }
