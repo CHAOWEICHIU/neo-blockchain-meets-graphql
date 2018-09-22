@@ -1,8 +1,23 @@
-module.exports = {
-  ethRpcEndpoint: '',
-  channelAccessToken: '',
-  channelSecret: '',
-  yelpClientId: '',
-  yelpApiKey: '',
-  cobinhoodApiKey: '',
-}
+require('dotenv').config()
+
+const {
+  NODE_ENV,
+  ETH_RPC_ENDPOINT,
+  LINE_CHANNEL_ACCESS_TOKEN,
+  LINE_CHANNEL_SECRET,
+  YELP_CLIENT_ID,
+  YELP_API_KEY,
+  COBINHOOD_API_KEY,
+} = process.env
+
+
+module.exports = NODE_ENV === 'test'
+  ? {}
+  : {
+    ETH_RPC_ENDPOINT,
+    LINE_CHANNEL_ACCESS_TOKEN,
+    LINE_CHANNEL_SECRET,
+    YELP_CLIENT_ID,
+    YELP_API_KEY,
+    COBINHOOD_API_KEY,
+  }

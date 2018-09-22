@@ -5,7 +5,7 @@ const {
   wsError,
   wsInfo,
 } = require('../../logger')
-const { cobinhoodApiKey } = require('../../../env')
+const { COBINHOOD_API_KEY } = require('../../../env')
 
 const typeMapping = word => ({
   s: 'snapshot',
@@ -24,7 +24,7 @@ const formatMsg = msg => ({
 const ws = new WebSocket(configMapping.cobinhood.wsEndpoint, {
   headers: {
     Origin: configMapping.cobinhood.origin,
-    Authorization: cobinhoodApiKey || '',
+    Authorization: COBINHOOD_API_KEY || '',
     Nonce: new Date().valueOf(),
   },
 })
