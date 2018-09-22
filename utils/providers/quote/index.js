@@ -10,6 +10,9 @@ const {
   subscribeOrderBook,
   formatMsg,
 } = require('../../services/cobinhood/webSocket')
+const {
+  COBINHOOD,
+} = require('../constants')
 
 const neededCurrenciesRate = [
   'ETH',
@@ -19,7 +22,7 @@ const neededCurrenciesRate = [
 Promise
   .all(neededCurrenciesRate.map(neededCurrencyRate => getRates({ currencyId: neededCurrencyRate })))
   .then(ratesResponse => ratesResponse.map(x => x.result))
-  .then(data => store.dispatch(receivedRates(data)))
+  .then(data => store.dispatch(receivedRates({ payload: data, platform: COBINHOOD })))
   .then(() => {
     subscribeOrderBook({ pair: 'ETH-USDT' })
     subscribeOrderBook({ pair: 'ETH-BTC' })
@@ -28,10 +31,20 @@ Promise
     ws.on('message', (response) => {
       const message = formatMsg(JSON.parse(response))
       const { data } = message
-      const [type, pair, additional] = message.channel.split('.')
+      const [type, pair] = message.channel.split('.')
       if (type === 'order-book') {
-        if (message.type === 'snapshot') return store.dispatch(receivedOrder({ pair, data, precision: additional }))
-        if (message.type === 'update') return store.dispatch(bufferOrder({ pair, data }))
+        if (message.type === 'snapshot') {
+          return store.dispatch(receivedOrder({
+            payload: { pair, data },
+            platform: COBINHOOD,
+          }))
+        }
+        if (message.type === 'update') {
+          return store.dispatch(bufferOrder({
+            payload: { pair, data },
+            platform: COBINHOOD,
+          }))
+        }
       }
       return ''
     })

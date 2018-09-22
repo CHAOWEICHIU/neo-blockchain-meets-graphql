@@ -1,5 +1,8 @@
 const WebSocket = require('ws')
-const { configMapping } = require('../constants')
+const {
+  COBINHOOD_WS_ENDPOINT,
+  COBINHOOD_ORIGIN,
+} = require('../../../config')
 const {
   wsWarning,
   wsError,
@@ -21,9 +24,9 @@ const formatMsg = msg => ({
   data: msg.d,
 })
 
-const ws = new WebSocket(configMapping.cobinhood.wsEndpoint, {
+const ws = new WebSocket(COBINHOOD_WS_ENDPOINT, {
   headers: {
-    Origin: configMapping.cobinhood.origin,
+    Origin: COBINHOOD_ORIGIN,
     Authorization: COBINHOOD_API_KEY || '',
     Nonce: new Date().valueOf(),
   },
