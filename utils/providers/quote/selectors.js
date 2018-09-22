@@ -3,18 +3,18 @@ const { Map, List } = require('immutable')
 
 const selectQuoteProviderDomain = state => state.quote
 
-const makeSelectOrderBooks = () => createSelector(
+const makeSelectOrderBooks = ({ platform }) => createSelector(
   selectQuoteProviderDomain,
-  quoteState => quoteState.get('orderBooks', Map()),
+  quoteState => quoteState.getIn(['orderBooks', platform], Map()),
 )
 
-const makeSelectOrderBook = ({ pair }) => createSelector(
-  makeSelectOrderBooks(),
+const makeSelectOrderBook = ({ pair, platform }) => createSelector(
+  makeSelectOrderBooks({ platform }),
   orderBooksState => orderBooksState.get(pair, Map()),
 )
 
-const makeSelectPairAskAndBid = ({ pair, count = 1 }) => createSelector(
-  makeSelectOrderBook({ pair }),
+const makeSelectPairAskAndBid = ({ pair, count = 1, platform }) => createSelector(
+  makeSelectOrderBook({ pair, platform }),
   (pairInformation) => {
     const asks = pairInformation.get('asks', List())
     const bids = pairInformation.get('bids', List())

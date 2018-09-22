@@ -4,18 +4,21 @@ const {
   BUFFER_ORDER,
 } = require('./constants')
 
-const receivedRates = payload => ({
+const receivedRates = ({ payload, platform }) => ({
   type: RECEIVED_RATES,
+  platform,
   payload,
 })
 
-const receivedOrder = ({ data, precision, pair }) => ({
+const receivedOrder = ({ payload: { data, precision, pair }, platform }) => ({
   type: RECEIVED_ORDER,
+  platform,
   payload: { data, precision, pair },
 })
 
-const bufferOrder = payload => ({
+const bufferOrder = ({ payload, platform }) => ({
   type: BUFFER_ORDER,
+  platform,
   payload,
 })
 
