@@ -39,14 +39,14 @@ const quoteProviderReducer = (state = initialState, action) => {
   switch (type) {
     case RECEIVED_RATES:
       if (platform === COBINHOOD) {
-        return state.set(['rates', COBINHOOD], payload)
+        return state.set(['rates', platform], payload)
       }
       return state
     case BUFFER_ORDER: {
       if (platform === COBINHOOD) {
         const { data, pair } = payload
-        let bids = state.getIn(['orderBooks', pair, 'bids'], List())
-        let asks = state.getIn(['orderBooks', pair, 'asks'], List())
+        let bids = state.getIn(['orderBooks', platform, pair, 'bids'], List())
+        let asks = state.getIn(['orderBooks', platform, pair, 'asks'], List())
         const inputBids = data.bids
         const inputAsks = data.asks
         let shouldSort = false
@@ -122,8 +122,8 @@ const quoteProviderReducer = (state = initialState, action) => {
         }
 
         return state
-          .setIn(['orderBooks', pair, 'bids'], bids)
-          .setIn(['orderBooks', pair, 'asks'], asks)
+          .setIn(['orderBooks', platform, pair, 'bids'], bids)
+          .setIn(['orderBooks', platform, pair, 'asks'], asks)
       }
 
       return state
@@ -158,9 +158,9 @@ const quoteProviderReducer = (state = initialState, action) => {
         const spread = sub(lowestAsk, highestBid)
 
         return state
-          .setIn(['orderBooks', pair, 'bids'], bids.sortBy(item => -1 * item.get('price')))
-          .setIn(['orderBooks', pair, 'asks'], asks.sortBy(item => item.get('price')))
-          .setIn(['orderBooks', pair, 'spread'], spread)
+          .setIn(['orderBooks', platform, pair, 'bids'], bids.sortBy(item => -1 * item.get('price')))
+          .setIn(['orderBooks', platform, pair, 'asks'], asks.sortBy(item => item.get('price')))
+          .setIn(['orderBooks', platform, pair, 'spread'], spread)
       }
       return state
     }

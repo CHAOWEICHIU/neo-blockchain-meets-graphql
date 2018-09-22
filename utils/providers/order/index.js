@@ -12,6 +12,9 @@ const {
 } = require('./actions')
 const { store } = require('../index')
 const { processLimitOrderFromWebSocket } = require('./utils')
+const {
+  COBINHOOD,
+} = require('../constants')
 
 const limit = 100
 
@@ -35,7 +38,10 @@ getOpenOrders({ limit })
     )
       .then(responses => flatten(responses.map(response => response.result.orders)))
       .then((orders) => {
-        store.dispatch(receivedOrders(orders))
+        store.dispatch(receivedOrders({
+          payload: { orders },
+          platform: COBINHOOD,
+        }))
         subscribeOrder()
 
         ws.on('message', (msg) => {
@@ -68,7 +74,10 @@ getOpenOrders({ limit })
               '0',
               'exchange' ]
             */
-            store.dispatch(receivedOrder(processLimitOrderFromWebSocket(data)))
+            store.dispatch(receivedOrder({
+              payload: processLimitOrderFromWebSocket(data),
+              platform: COBINHOOD,
+            }))
           }
         })
       })

@@ -26,6 +26,7 @@ require('./order')
 const base = 1000
 
 const arbitrage = ({
+  flow,
   askEth,
   buyEth,
   askBtc,
@@ -33,6 +34,7 @@ const arbitrage = ({
   askUsdt,
   buyUsdt,
 }) => ({
+  flow,
   arbitrageBuy: div(
     mul(base, buyEth.getIn([0, 'price'])),
     askBtc.getIn([0, 'price']),
