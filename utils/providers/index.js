@@ -1,7 +1,7 @@
 const moment = require('moment')
-const fs = require('fs')
 const { min } = require('lodash')
 const { createStore, combineReducers } = require('redux')
+const { arbitrageLogger } = require('../logger')
 const quoteProviderReducer = require('./quote/reducer')
 const orderProviderReducer = require('./order/reducer')
 const { mul, div } = require('../calculation')
@@ -90,19 +90,7 @@ const logging = ({
   `
 
   if (arbitrageBuy > base || arbitrageSell > base) {
-    const data = JSON.parse(fs.readFileSync('./record.json', 'utf8'))
-    console.log(log)
-    data.push({
-      flow,
-      time: moment().format('YYYY-MM-DD hh:mm:ss'),
-      arbitrageBuy,
-      maxForBuy,
-      arbitrageSell,
-      maxForSell,
-    })
-    fs.writeFile('./record.json', JSON.stringify(data, null, 2), 'utf8', (err) => {
-      console.log(err)
-    })
+    arbitrageLogger(log)
   }
 }
 
